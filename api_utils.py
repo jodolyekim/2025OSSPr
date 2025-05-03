@@ -4,7 +4,7 @@ import streamlit as st
 import requests
 
 load_dotenv()
-API_KEY = os.getenv("TDMB_API_KEY")
+API_KEY = os.getenv("TMDB_API_KEY")
 
 # 영화 검색 함수
 def search_movie_tmdb(title):
