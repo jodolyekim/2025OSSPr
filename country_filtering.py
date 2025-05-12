@@ -8,5 +8,3 @@ def select_country():
     }
     country_code = country_code_map[country_name]
     return country_code
-
-
