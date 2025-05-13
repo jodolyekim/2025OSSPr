@@ -12,8 +12,8 @@ logo_map = {
     "Amazon": "images/amazon.png",
     "Hulu": "images/hulu.png",
     "Max": "images/max.png",
-    "Stan": "images/stan.png"
-
+    "Stan": "images/stan.png",
+    "Google Play Movies": "images/google_play_movies.png"
 }
 
 # Streamlit UI
