@@ -1,6 +1,6 @@
 import streamlit as st
-from api_utils import search_movie_tmdb, get_providers, get_trailer_url
 from country_filtering import select_country
+from api_utils import search_movie_tmdb, get_providers, get_trailer_url, translate_to_korean, is_english
 
 # OTT 로고 매핑 (작은 이미지 아이콘)
 logo_map = {
@@ -40,7 +40,7 @@ if st.button("검색"):
             providers = get_providers(movie["id"], country_code)
 
             # 예고편 URL 불러오기
-            trailer_url = get_trailer_url(movie["id"])
+            trailer_url = movie.get("trailer_url")
 
             # 제목 출력 (한글 + 영어)
             st.success(f"'{movie['title_ko']}' ({movie['title_en']})는 {country_name}에서 다음 OTT에서 시청할 수 있어요:")
@@ -50,6 +50,18 @@ if st.button("검색"):
                 poster_url = f"https://image.tmdb.org/t/p/w500{movie['poster_path']}"
                 st.image(poster_url, width=250)
 
+            # 영화 소개(overview) 출력 및 자동 번역
+            if movie.get("overview"):
+                st.markdown("### 📘 Overview (영화 소개)")
+                st.write(movie["overview"])  # 원문 출력
+
+                # 영어인 경우만 번역
+                if is_english(movie["overview"]):
+                    translated = translate_to_korean(movie["overview"])
+                    st.write(f"➡️ {translated}")
+                else:
+                    st.info("이 영화 소개는 이미 한국어입니다.")
+
             # 예고편 영상 출력
             if trailer_url:
                 st.video(trailer_url)  # YouTube 예고편 영상
@@ -58,7 +70,7 @@ if st.button("검색"):
 
 
             # OTT 출력 (로고 + 이름)
-            if providers:
+            if isinstance(providers, list) and providers:
                 for p in providers:
                     matched_logo = None
                     p_lower = p.lower()
@@ -75,3 +87,4 @@ if st.button("검색"):
                     cols[1].write(p)
             else:
                 st.warning("해당 국가에서 시청 가능한 OTT 플랫폼이 없습니다.")
+

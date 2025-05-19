@@ -1,7 +1,11 @@
 import os
 from dotenv import load_dotenv
+from googletrans import Translator
 import streamlit as st
 import requests
+import re
+
+translator = Translator()
 
 load_dotenv()
 API_KEY = os.getenv("TMDB_API_KEY")
@@ -13,7 +17,7 @@ def search_movie_tmdb(title, country):
     params = {
         "api_key": API_KEY,
         "query": title,
-        "language": "ko-KR"
+        "language": "en-US"
     }
     response = requests.get(search_url, params=params)
     results = response.json().get("results", [])
@@ -32,7 +36,8 @@ def search_movie_tmdb(title, country):
         "title_ko": title_ko,
         "title_en": title_en,
         "poster_path": poster_path,
-        "trailer_url": trailer_url
+        "overview": movie.get("overview", ""),
+        "trailer_url": get_trailer_url(movie_id)
     }
 
 
@@ -64,3 +69,17 @@ def get_trailer_url(movie_id):
             youtube_key = video["key"]
             return f"https://www.youtube.com/watch?v={youtube_key}"
     return None
+
+# 영화 소개 번역 함수
+def translate_to_korean(text):
+    if not text:
+        return ""
+    result = translator.translate(text, dest="ko")
+    return result.text
+
+def is_english(text):
+    """영문 비율이 60% 이상이면 영어로 간주"""
+    if not text:
+        return False
+    letters = re.findall(r'[a-zA-Z]', text)
+    return len(letters) / max(len(text), 1) > 0.6
