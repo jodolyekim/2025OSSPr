@@ -16,6 +16,23 @@ logo_map = {
     "Google Play Movies": "images/google_play_movies.png"
 }
 
+# OTT 출력 함수 (로고 포함)
+def render_platform_list(name_list):
+    for name in name_list:
+        matched_logo = None
+        name_lower = name.lower()
+        for key in logo_map:
+            if key.lower() in name_lower:
+                matched_logo = logo_map[key]
+                break
+
+        cols = st.columns([1.2, 8.8])
+        if matched_logo:
+            cols[0].image(matched_logo, width=30)
+        else:
+            cols[0].write("🎬")
+        cols[1].write(name)
+
 # Streamlit UI
 st.title("🎬 OTT 어디있니?")
 st.write("영화 제목을 입력하고, 어떤 OTT에서 볼 수 있는지 확인해보세요!")
@@ -50,6 +67,12 @@ if st.button("검색"):
                 poster_url = f"https://image.tmdb.org/t/p/w500{movie['poster_path']}"
                 st.image(poster_url, width=250)
 
+
+            # 개봉일 + 평점 출력
+            st.markdown(f"📅 **개봉일**: {movie['release_date']}")
+            stars = "⭐" * int(round(movie['vote_average']))
+            st.markdown(f"⭐ **평점**: {movie['vote_average']} {stars}")
+
             # 영화 소개(overview) 출력 및 자동 번역
             if movie.get("overview"):
                 st.markdown("### 📘 Overview (영화 소개)")
@@ -69,22 +92,20 @@ if st.button("검색"):
                 st.info("예고편이 제공되지 않습니다.")  # 예고편 없을 때 메시지
 
 
-            # OTT 출력 (로고 + 이름)
-            if isinstance(providers, list) and providers:
-                for p in providers:
-                    matched_logo = None
-                    p_lower = p.lower()
-                    for key in logo_map:
-                        if key.lower() in p_lower:
-                            matched_logo = logo_map[key]
-                            break
+            # OTT 구분 출력
+            st.markdown("### 🎟️ OTT 플랫폼")
+            if isinstance(providers, dict) and any(providers.values()):
+                if providers["flatrate"]:
+                    st.markdown("**✅ 구독 가능 플랫폼**")
+                    render_platform_list(providers["flatrate"])
 
-                    cols = st.columns([1.2, 8.8])
-                    if matched_logo:
-                        cols[0].image(matched_logo, width=30)
-                    else:
-                        cols[0].write("🎬")
-                    cols[1].write(p)
+                if providers["rent"]:
+                    st.markdown("**💰 대여 가능 플랫폼**")
+                    render_platform_list(providers["rent"])
+
+                if providers["buy"]:
+                    st.markdown("**🛒 구매 가능 플랫폼**")
+                    render_platform_list(providers["buy"])
             else:
-                st.warning("해당 국가에서 시청 가능한 OTT 플랫폼이 없습니다.")
+                st.warning("해당 국가에서 시청 가능한 플랫폼이 없습니다.")
 
