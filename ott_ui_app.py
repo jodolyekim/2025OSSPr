@@ -1,5 +1,5 @@
 import streamlit as st
-from api_utils import search_movie_tmdb, get_providers
+from api_utils import search_movie_tmdb, get_providers, get_trailer_url
 from country_filtering import select_country
 
 # OTT 로고 매핑 (작은 이미지 아이콘)
@@ -33,11 +33,14 @@ movie_title = st.text_input("영화 제목 입력")
 # 검색 버튼
 if st.button("검색"):
     with st.spinner("검색 중..."):
-        movie = search_movie_tmdb(movie_title)
-        if not movie:
+        movie = search_movie_tmdb(movie_title, country_code)
+        if movie is None or "id" not in movie:
             st.error("영화를 찾을 수 없습니다. 제목을 확인해주세요.")
         else:
             providers = get_providers(movie["id"], country_code)
+
+            # 예고편 URL 불러오기
+            trailer_url = get_trailer_url(movie["id"])
 
             # 제목 출력 (한글 + 영어)
             st.success(f"'{movie['title_ko']}' ({movie['title_en']})는 {country_name}에서 다음 OTT에서 시청할 수 있어요:")
@@ -46,6 +49,13 @@ if st.button("검색"):
             if movie["poster_path"]:
                 poster_url = f"https://image.tmdb.org/t/p/w500{movie['poster_path']}"
                 st.image(poster_url, width=250)
+
+            # 예고편 영상 출력
+            if trailer_url:
+                st.video(trailer_url)  # YouTube 예고편 영상
+            else:
+                st.info("예고편이 제공되지 않습니다.")  # 예고편 없을 때 메시지
+
 
             # OTT 출력 (로고 + 이름)
             if providers:
