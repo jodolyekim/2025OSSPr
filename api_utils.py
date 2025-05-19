@@ -36,6 +36,8 @@ def search_movie_tmdb(title, country):
         "title_ko": title_ko,
         "title_en": title_en,
         "poster_path": poster_path,
+        "release_date": movie.get("release_date", "알 수 없음"),
+        "vote_average": movie.get("vote_average", 0.0),
         "overview": movie.get("overview", ""),
         "trailer_url": get_trailer_url(movie_id)
     }
@@ -43,19 +45,17 @@ def search_movie_tmdb(title, country):
 
 # OTT 플랫폼 조회 함수
 def get_providers(movie_id, country_code):
-    if not country_code:
-        return "전체 OTT 확인 불가"
-
     url = f"{BASE_URL}/movie/{movie_id}/watch/providers"
     params = {"api_key": API_KEY}
     response = requests.get(url, params=params)
-    data = response.json().get("results", {})
-    country_data = data.get(country_code, {})
+    data = response.json().get("results", {}).get(country_code, {})
 
-    providers = country_data.get("flatrate", [])
-    provider_names = [p["provider_name"] for p in providers]
+    return {
+        "flatrate": [p["provider_name"] for p in data.get("flatrate", [])],
+        "rent": [p["provider_name"] for p in data.get("rent", [])],
+        "buy": [p["provider_name"] for p in data.get("buy", [])]
+    }
 
-    return provider_names if provider_names else "해당 국가에서는 제공되지 않음"
 
 # 예고편 조회 함수
 def get_trailer_url(movie_id):
@@ -83,3 +83,4 @@ def is_english(text):
         return False
     letters = re.findall(r'[a-zA-Z]', text)
     return len(letters) / max(len(text), 1) > 0.6
+
