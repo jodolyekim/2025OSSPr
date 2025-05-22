@@ -94,7 +94,6 @@ def get_providers(content_id, media_type="movie", country_code='KR'):
         params = {"api_key": TMDB_API_KEY}
         response = requests.get(url, params=params)
         results = response.json().get("results", {})
-
         country_data = results.get(country_code)
         if not country_data:
             return {}
