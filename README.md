@@ -1,4 +1,4 @@
-안녕하세요 . 현재까지
+구현된 기능
 
 1. 검색
 2. 영화 -> 컨텐츠 확장
@@ -9,10 +9,7 @@
 7. 국가 필터링으로 각 국가별로 볼 수 있는 ott랑 가격 추가(가격은 현지 통화로 구성, 한화로 환전 기능도 넣음)
 8. 영화 정보 (출연진, 러닝타임 등등) 추가
 9. 유튜브 미리보기 추가
-
-이렇게 구성을 해서 깃 브랜치 checkpoint-0523에 올려놓았습니다. 이 파일 다운 받으셔서 작업 부탁드립니다!
-어쩌다보니 하다보니 욕심이 생겨서 이것저것 건드렸습니다..! 부디 괜찮길 바라봅니다!
-다음주 수요일까지 본인 할 일 하시고 업로드 부탁드려요~
+10. 기념일 추천 컨텐츠 🆕
 
 
 
@@ -37,6 +34,12 @@
 
 ### 📊 가성비 계산기
 - 최대 10개의 콘텐츠를 찜하여 어떤 OTT가 가장 가성비 좋은지 시각적으로 비교합니다.
+
+### 📅 기념일 콘텐츠 추천 (🆕)
+- 사용자가 날짜를 선택하면, 해당 날짜가 삼일절·현충일·크리스마스 등 국가 기념일일 경우 추천 콘텐츠 자동 출력
+- 추천 콘텐츠는 JSON 파일에 정적으로 저장되어 있어 빠르게 로딩되며, 영화·드라마 등 다양한 포맷 지원
+- 관련 파일: `event_contents.py`, `static_event_contents.json`
+
 
 ---
 
@@ -81,14 +84,16 @@
 
 ```
 📦 2025OSSPr-feature-frontend-ui
-├── home.py                    # 메인 콘텐츠 검색 페이지
+├── home.py # 메인 콘텐츠 검색 페이지
 ├── pages/
-│   ├── 1_calc_page.py         # 가성비 계산기
-│   ├── 2_mbti_page.py         # MBTI 추천기
-├── contents_search.py        # TMDB 관련 함수 모듈
-├── country_filtering.py      # 국가 및 언어 관련 모듈
-├── ott_prices.db             # OTT 요금 DB
-├── .env                      # API 키 저장
+│ ├── 1_calc_page.py # 가성비 계산기
+│ ├── 2_mbti_page.py # MBTI 추천기
+├── contents_search.py # TMDB 관련 함수 모듈
+├── country_filtering.py # 국가 및 언어 관련 모듈
+├── event_contents.py # 기념일 추천 콘텐츠 처리 모듈 🆕
+├── static_event_contents.json # 기념일별 추천 콘텐츠 데이터 🆕
+├── ott_prices.db # OTT 요금 DB
+├── .env # API 키 저장
 └── README.md
 ```
 
