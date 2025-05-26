@@ -1,4 +1,6 @@
 import streamlit as st
+import datetime
+
 from contents_search import (
     search_movie_tmdb,
     get_providers,
@@ -13,6 +15,11 @@ from country_filtering import (
     get_available_countries,
     get_language_code
 )
+
+from event_contents import (
+    get_today_contents
+)
+
 
 def extract_title(c):
     return c.get("title_ko") or c.get("title") or "제목없음"
@@ -39,6 +46,40 @@ def extract_year(c, media_type):
 
 st.set_page_config(page_title="🌍 OTT 콘텐츠 검색기", layout="wide")
 st.title("🎬 통합 OTT 콘텐츠 검색기 (요금 + 설명 번역 지원)")
+
+# 날짜 선택 UI (기본값은 오늘)
+test_date = st.date_input("날짜 선택", value=datetime.date.today())
+contents = get_today_contents(test_date=test_date)
+
+if contents:
+    st.subheader("📅 오늘의 추천 콘텐츠")
+    for c in contents:
+        title = c["title"]
+        media_type = c.get("media_type", "movie").upper()
+        release = c.get("release_date", "미정")
+        vote = c.get("vote_average", 0.0)
+        tagline = c.get("tag_line")
+
+        # 포스터 경로 처리
+        raw_poster = str(c.get("poster_path") or "").strip()
+        is_valid_poster = raw_poster.startswith("/") and len(raw_poster) > 5
+        image_url = (
+            f"https://image.tmdb.org/t/p/w440_and_h660_face{raw_poster}"
+            if is_valid_poster
+            else "https://via.placeholder.com/100x150?text=No+Image"
+        )
+
+        col1, col2 = st.columns([1, 4])
+        with col1:
+            st.image(image_url, width=100)
+        with col2:
+            st.markdown(f"**{title}** ({media_type}) - {release}")
+            st.markdown(f"⭐ 평점: {vote}")
+            st.markdown(tagline)
+else:
+    st.info("오늘은 추천할 콘텐츠가 없습니다.")
+
+
 
 if 'selected_movie_data' in st.session_state:
     content = st.session_state.pop('selected_movie_data')
@@ -217,3 +258,5 @@ if contents:
 
 else:
     st.info("🔍 콘텐츠를 검색하거나, MBTI 추천기로 이동해 콘텐츠를 찾아보세요.")
+
+
