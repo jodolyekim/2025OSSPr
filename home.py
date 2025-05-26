@@ -1,4 +1,6 @@
 import streamlit as st
+st.set_page_config(page_title="🌍 OTT 콘텐츠 검색기", layout="wide")
+
 from contents_search import (
     search_movie_tmdb,
     get_providers,
@@ -7,23 +9,27 @@ from contents_search import (
     get_trailer_url,
     get_details,
     get_multilang_overview,
-    get_trailer_embed_url_ytdlp
+    get_trailer_embed_url_ytdlp,
+    get_initial_contents
 )
 from country_filtering import (
     get_available_countries,
     get_language_code
 )
+from recommend_engine import SimilarityRecommender
+
+if "recommender" not in st.session_state:
+    base_contents = get_initial_contents(count=5000)
+    st.session_state["base_contents"] = base_contents
+    st.session_state["recommender"] = SimilarityRecommender(base_contents)
 
 def extract_title(c):
     return c.get("title_ko") or c.get("title") or "제목없음"
 
 def extract_year(c, media_type):
-    # TMDB가 first_air_date를 안 줄 수도 있으니 release_date도 같이 고려
     date = c.get("release_date") or c.get("first_air_date")
     if date and len(date) >= 4:
         return date[:4]
-
-    # fallback: 상세정보에서 가져오기
     try:
         details = get_details(c["id"], media_type)
         date = details.get("first_air_date") or details.get("release_date")
@@ -31,13 +37,8 @@ def extract_year(c, media_type):
             return date[:4]
     except:
         pass
-
     return "방영일 미정"
 
-
-
-
-st.set_page_config(page_title="🌍 OTT 콘텐츠 검색기", layout="wide")
 st.title("🎬 통합 OTT 콘텐츠 검색기 (요금 + 설명 번역 지원)")
 
 if 'selected_movie_data' in st.session_state:
@@ -71,30 +72,16 @@ if contents:
                 st.info("검색된 콘텐츠가 없습니다.")
                 continue
 
-            options = []
-            for c in filtered:
-                this_title = extract_title(c)
-                year = extract_year(c, media_type)
-                options.append(f"{this_title} ({year})")
-
+            options = [f"{extract_title(c)} ({extract_year(c, media_type)})" for c in filtered]
             selected = st.radio("원하는 콘텐츠를 선택하세요", options=options, key=media_type)
-
-            content = next(
-                (c for c in filtered if f"{extract_title(c)} ({extract_year(c, media_type)})" == selected),
-                None
-            )
+            content = next((c for c in filtered if f"{extract_title(c)} ({extract_year(c, media_type)})" == selected), None)
             if content is None:
                 st.error("⚠️ 선택한 콘텐츠를 찾을 수 없습니다.")
                 st.stop()
 
             country_dict = get_available_countries()
             default_idx = list(country_dict.keys()).index("한국") if "한국" in country_dict else 0
-            selected_country = st.selectbox(
-                "🌍 국가를 선택하세요",
-                list(country_dict.keys()),
-                index=default_idx,
-                key=f"country_{media_type}"
-            )
+            selected_country = st.selectbox("🌍 국가를 선택하세요", list(country_dict.keys()), index=default_idx, key=f"country_{media_type}")
             selected_code = country_dict[selected_country]
             target_lang = get_language_code(selected_code)
 
@@ -165,24 +152,15 @@ if contents:
                 st.markdown("**🎞️ 예고편:**")
                 st.video(content["trailer_embed"])
 
-            # OTT 정보
             st.subheader(f"📺 {selected_country}에서 시청 가능한 OTT 플랫폼")
-
-            # ✅ media_type이 없을 경우 대비
             media_type_value = content.get("media_type", media_type)
             providers = get_providers(content['id'], media_type_value, country_code=selected_code)
             if providers:
                 for monetization, platforms in providers.items():
-                    label = {
-                        "flatrate": "📦 구독형",
-                        "rent": "🎟️ 대여",
-                        "buy": "🛒 구매"
-                    }.get(monetization, monetization)
-
+                    label = {"flatrate": "📦 구독형", "rent": "🎟️ 대여", "buy": "🛒 구매"}.get(monetization, monetization)
                     if not platforms:
                         st.warning(f"❌ {selected_country}에서 {label} 서비스로는 제공되지 않습니다.")
                         continue
-
                     st.markdown(f"#### {label}")
                     for platform in platforms:
                         platform_name = platform["name"].lower()
@@ -202,9 +180,7 @@ if contents:
                                     if rows:
                                         for plan, local, krw, user_cnt, has_ads in rows:
                                             ad_str = " | **🎞️ 광고 포함**" if has_ads else ""
-                                            st.markdown(
-                                                f"- **{plan}**: {int(local):,}원 (약 ₩{int(krw):,}) / 최대 {user_cnt}명 사용 가능{ad_str}"
-                                            )
+                                            st.markdown(f"- **{plan}**: {int(local):,}원 (약 ₩{int(krw):,}) / 최대 {user_cnt}명 사용 가능{ad_str}")
                                     else:
                                         st.markdown("- 요금 정보 없음")
                                 else:
@@ -215,5 +191,24 @@ if contents:
             else:
                 st.warning("❌ 현재 선택한 콘텐츠는 해당 국가의 OTT에서 제공되지 않거나 정보가 없습니다.")
 
+            # 추천 콘텐츠 출력
+            st.markdown("---")
+            st.subheader("🤖 이 콘텐츠와 비슷한 추천작")
+
+            similar = st.session_state["recommender"].get_similar(content["id"])
+            if similar:
+                for i in range(0, len(similar), 5):
+                    row = st.columns(5)
+                    for j, sim in enumerate(similar[i:i+5]):
+                        with row[j]:
+                            st.markdown(f"**🎬 {sim.get('title_ko', sim.get('title', '제목 없음'))}**", unsafe_allow_html=True)
+                            if sim.get("poster_path"):
+                                st.image(f"https://image.tmdb.org/t/p/w200{sim['poster_path']}", use_container_width=True)
+
+                            sim_providers = get_providers(sim["id"], sim.get("media_type", "movie"), country_code=selected_code)
+                            otts = [p["name"] for p in sim_providers.get("flatrate", [])]
+                            st.markdown("📺 " + (", ".join(otts) if otts else "정보 없음"))
+            else:
+                st.info("유사 콘텐츠를 찾을 수 없습니다.")
 else:
     st.info("🔍 콘텐츠를 검색하거나, MBTI 추천기로 이동해 콘텐츠를 찾아보세요.")
