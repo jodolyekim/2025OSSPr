@@ -1,7 +1,6 @@
 # OTT 콘텐츠 검색기
 이 프로젝트는 TMDB API를 기반으로 한 OTT 콘텐츠 검색기입니다.
 사용자는 영화 및 예능/드라마 정보를 검색하고, 국가별 시청 가능한 OTT 플랫폼과 요금 정보를 확인할 수 있습니다.
-또한 MBTI 및 감정 기반 추천 기능, 유명 영화제 수상작 보여주는 기능, 기념일에 따른 영화 추천 기능, 유사한 영화 추천 기능도 포함되어 있습니다.
 
 ---
 
@@ -19,13 +18,6 @@
   - MBTI 유형과 오늘의 기분(이모지)을 선택하여  
   - 사전 정의된 가중치에 따라 장르별 인기 콘텐츠 추천  
   - “자세히 보기” 버튼 클릭 시 해당 콘텐츠 상세 정보로 바로 이동
-- **유명 영화제 수상작 리스트**
-  - 칸, 베니스, 베를린 영화제 수상작을 연도별로 조회
-  - 각 영화제 로고, 포스터, 제목, 평점, 줄거리 제공
-  - "메인에서 검색하기" 버튼으로 바로 메인 페이지를 통해 검색도 가능
-- **기념일 기반 추천**
-  - 날짜를 선택하면, 해당 날짜에 관련된 특별한 영화를 추천
-  - 포스터, 평점 등을 함께 표시
 - **다국어 번역**  
   - `googletrans`를 이용해 제목·줄거리 등 영어 데이터를 한국어, 일본어, 프랑스어 등으로 번역  
 - **예고편 미리보기**  
@@ -39,9 +31,8 @@
 - **프로그래밍 언어**: Python 3.8 이상  
 - **웹 프레임워크**: Streamlit  
 - **API**: TMDb API (콘텐츠 검색, 예고편, 제공처 조회)  
-- **데이터베이스**: SQLite (`ott_prices.db`, `award_winners.db`)  
+- **데이터베이스**: SQLite (`ott_prices.db`)  
 - **번역 라이브러리**: googletrans  
-- **유사 영화 추천 알고리즘**: rapidfuzz  
 - **데이터 처리**: pandas  
 - **비디오 임베드 변환**: yt-dlp  
 - **환경변수 관리**: python-dotenv  
@@ -90,12 +81,7 @@
 ├── home.py
 ├── contents_search.py
 ├── country_filtering.py
-├── recommend_engine.py
-├── event_contents.py
-├── create_award_db.py
 ├── ott_prices.db
-├── award_winners.db
-├── static_event_contents.json
 ├── images/
 │   ├── netflix.png
 │   ├── watcha.png
@@ -107,31 +93,23 @@
 │   ├── google_play_movies.png
 │   ├── hulu.png
 │   ├── max.png
-│   ├── stan.png
-│   ├── cannes.png
-│   ├── berlin.png
-│   └── venice.png
+│   └── stan.png
 ├── .env
 ├── README.md
 ├── requirements.txt
 └── pages/
     ├── 1_calc_page.py
-    ├── 2_mbti_page.py
-    └── 3_awards_page.py
+    └── 2_mbti_page.py
 
 ```
 
 - **home.py**: 메인 페이지
 - **contents_search.py**: TMDB API 연동 및 데이터 조회 유틸 함수  
-- **country_filtering.py**: 국가 목록, 언어 코드 매핑
-- **recommend_engine.py**: RapidFuzz 기반 유사 영화 추천
-- **event_contents.py**: 날짜별 기념일 데이터(static_event_contents.json)를 불러오는 함수  
+- **country_filtering.py**: 국가 목록, 언어 코드 매핑  
 - **ott_prices.db**: 국가별·플랫폼별 요금 정보 SQLite DB
-- **award_winners.db**: 칸, 베를린, 베니스 영화제 수상작 및 수상년도 매핑해놓은 SQLite DB
 - **images/**: OTT 및 영화제 로고들을 저장해놓은 이미지 폴더  
 - **.env**: TMDB API 키 환경변수 파일  
 - **requirements.txt**: 프로젝트 의존성 목록  
 - **pages/1_calc_page.py**: OTT 가성비 계산기 페이지  
 - **pages/2_mbti_page.py**: MBTI + 감정 기반 콘텐츠 추천 페이지  
-- **pages/3_mbti_page.py**: 세계 3대 영화제(칸, 베니스, 베를린) 수상작 리스트 페이지 
 ---
