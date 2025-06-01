@@ -87,7 +87,6 @@
 ├── home.py
 ├── contents_search.py
 ├── country_filtering.py
-├── create_award_db.py
 ├── ott_prices.db
 ├── award_winners.db
 ├── static_event_contents.json
