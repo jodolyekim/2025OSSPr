@@ -1,100 +1,137 @@
-안녕하세요 . 현재까지
-
-1. 검색
-2. 영화 -> 컨텐츠 확장
-3. db로 각 ott별 가격 정리
-4. mbti별 추천 기능 추가 + 이모지(오픈소스) 기능을 추가하여 그 날 기분에 따라 추천에 차등을 둠.
-5. 번역기능 추가 -> 일어, 불어 등 다양한 언어로 번역 (한국어랑 동시에 보임)
-6. 계산기 추가 (pandas 이용, 그래프는 오픈소스 안쓰고 직접 코딩 -> panadas 기능 확장) 그 외에도 광고 유무, 사용자 수에 따른 계산 등 여러 기능 추가
-7. 국가 필터링으로 각 국가별로 볼 수 있는 ott랑 가격 추가(가격은 현지 통화로 구성, 한화로 환전 기능도 넣음)
-8. 영화 정보 (출연진, 러닝타임 등등) 추가
-9. 유튜브 미리보기 추가
-
-이렇게 구성을 해서 깃 브랜치 checkpoint-0523에 올려놓았습니다. 이 파일 다운 받으셔서 작업 부탁드립니다!
-어쩌다보니 하다보니 욕심이 생겨서 이것저것 건드렸습니다..! 부디 괜찮길 바라봅니다!
-다음주 수요일까지 본인 할 일 하시고 업로드 부탁드려요~
-
-
-
-
-# 🎬 OTT 콘텐츠 검색기 (요금 + 설명 번역 지원)
-
-이 프로젝트는 TMDB API를 기반으로 한 OTT 콘텐츠 검색기입니다. 사용자는 영화 및 예능/드라마 정보를 검색하고, 국가별 시청 가능 OTT 플랫폼과 요금 정보를 확인할 수 있습니다. 또한 MBTI 및 감정 기반 추천 기능도 탑재되어 있습니다.
+# OTT 콘텐츠 검색기
+이 프로젝트는 TMDB API를 기반으로 한 OTT 콘텐츠 검색기입니다.
+사용자는 영화 및 예능/드라마 정보를 검색하고, 국가별 시청 가능한 OTT 플랫폼과 요금 정보를 확인할 수 있습니다.
+또한 MBTI 및 감정 기반 추천 기능, 유명 영화제 수상작 보여주는 기능, 기념일에 따른 영화 추천 기능, 유사한 영화 추천 기능도 포함되어 있습니다.
 
 ---
 
-## 📌 주요 기능
+## 주요 기능
 
-### 🔍 콘텐츠 검색
-- 영화 및 드라마/예능을 검색하여 결과를 보여줍니다.
-- 국가별 OTT 제공 플랫폼, 가격 정보 제공 (정가 및 광고 여부 포함).
-- 유튜브 예고편 임베딩 지원.
-
-### 🧠 MBTI 기반 추천기
-- 사용자 MBTI 및 감정 이모지 입력을 바탕으로 관련 장르 추천.
-- 각 장르별 인기 콘텐츠를 TMDB에서 불러와 추천.
-- 추천된 영화 상세정보 보기 기능.
-
-### 📊 가성비 계산기
-- 최대 10개의 콘텐츠를 찜하여 어떤 OTT가 가장 가성비 좋은지 시각적으로 비교합니다.
-
----
-
-## 🛠️ 기술 스택
-
-- Python 3.9+
-- Streamlit
-- Requests
-- dotenv
-- TMDB API (The Movie Database)
-- Google Translate (선택적)
-- SQLite (OTT 요금 DB)
-
----
-
-## 🚀 실행 방법
-
-1. 가상환경 설정 (선택사항)
-    ```bash
-    python -m venv .venv
-    source .venv/bin/activate  # Windows는 .venv\Scripts\activate
-    ```
-
-2. 패키지 설치
-    ```bash
-    pip install -r requirements.txt
-    ```
-
-3. `.env` 파일 생성 및 API 키 저장
-    ```env
-    TMDB_API_KEY=your_tmdb_key
-    ```
-
-4. 앱 실행
-    ```bash
-    streamlit run home.py
-    ```
+- **OTT 콘텐츠 검색**  
+  - TMDB API를 사용해 영화/TV/예능 제목으로 검색  
+  - 국가별 스트리밍 제공처(넷플릭스, 왓챠 등) 및 요금 정보 확인  
+  - 포스터, 개봉일, 출연진, 러닝타임, 줄거리 등 상세 정보 제공  
+- **가성비 계산기**  
+  - 사용자가 찜한 콘텐츠 목록을 기반으로  
+  - 선택한 국가의 월 구독료, 제공 콘텐츠 수, 사용자 수를 고려해 1인당 콘텐츠당 비용 계산  
+  - 테이블과 간단한 막대 그래프로 결과 시각화  
+- **MBTI + 감정 기반 추천**  
+  - MBTI 유형과 오늘의 기분(이모지)을 선택하여  
+  - 사전 정의된 가중치에 따라 장르별 인기 콘텐츠 추천  
+  - “자세히 보기” 버튼 클릭 시 해당 콘텐츠 상세 정보로 바로 이동
+- **유명 영화제 수상작 리스트**
+  - 칸, 베니스, 베를린 영화제 수상작을 연도별로 조회
+  - 각 영화제 로고, 포스터, 제목, 평점, 줄거리 제공
+  - "메인에서 검색하기" 버튼으로 바로 메인 페이지를 통해 검색도 가능
+- **기념일 기반 추천**
+  - 날짜를 선택하면, 해당 날짜에 관련된 특별한 영화를 추천
+  - 포스터, 평점 등을 함께 표시
+- **다국어 번역**  
+  - `googletrans`를 이용해 제목·줄거리 등 영어 데이터를 한국어, 일본어, 프랑스어 등으로 번역  
+- **예고편 미리보기**  
+  - TMDB에서 가져온 YouTube 예고편 URL을 `yt-dlp`로 임베드 가능한 형태로 변환  
+  - Streamlit 내에서 간단한 플레이어처럼 재생 가능  
 
 ---
 
-## 📁 디렉토리 구조
+## 기술 스택
+
+- **프로그래밍 언어**: Python 3.8 이상  
+- **웹 프레임워크**: Streamlit  
+- **API**: TMDb API (콘텐츠 검색, 예고편, 제공처 조회)  
+- **데이터베이스**: SQLite (`ott_prices.db`, `award_winners.db`)  
+- **번역 라이브러리**: googletrans  
+- **유사 영화 추천 알고리즘**: rapidfuzz  
+- **데이터 처리**: pandas  
+- **비디오 임베드 변환**: yt-dlp  
+- **환경변수 관리**: python-dotenv  
+
+---
+
+## 실행 방법
+
+1. **프로젝트 클론 및 이동**
+   ```bash
+   git clone <레포지토리_URL>
+   cd <프로젝트_폴더>
+   ```
+
+2. **가상환경 설정 (선택)**(굳이 필요 X)
+   ```bash
+   python -m venv .venv
+   source .venv/bin/activate        # macOS/Linux
+   .venv\Scripts\activate.bat       # Windows
+   ```
+
+3. **환경변수 설정 (`.env` 파일 생성)**
+   ```
+   TMDB_API_KEY=<발급받은_API_Key>
+   ```
+   - `.env` 파일은 프로젝트 루트에 위치해야 합니다.
+
+4. **패키지 설치**
+   ```bash
+   pip install --upgrade pip
+   pip install -r requirements.txt
+   ```
+
+5. **앱 실행**
+   ```bash
+   streamlit run home.py
+   ```
+   - 브라우저가 열리며, 사이드바에서 계산기, MBTI 추천, OTT 검색 페이지로 이동할 수 있습니다.
+
+---
+
+## 디렉토리 구조
 
 ```
-📦 2025OSSPr-feature-frontend-ui
-├── home.py                    # 메인 콘텐츠 검색 페이지
-├── pages/
-│   ├── 1_calc_page.py         # 가성비 계산기
-│   ├── 2_mbti_page.py         # MBTI 추천기
-├── contents_search.py        # TMDB 관련 함수 모듈
-├── country_filtering.py      # 국가 및 언어 관련 모듈
-├── ott_prices.db             # OTT 요금 DB
-├── .env                      # API 키 저장
-└── README.md
+프로젝트 루트/
+├── home.py
+├── contents_search.py
+├── country_filtering.py
+├── recommend_engine.py
+├── event_contents.py
+├── create_award_db.py
+├── ott_prices.db
+├── award_winners.db
+├── static_event_contents.json
+├── images/
+│   ├── netflix.png
+│   ├── watcha.png
+│   ├── wavve.png
+│   ├── tving.png
+│   ├── disneyplus.png
+│   ├── apple.png
+│   ├── amazon.png
+│   ├── google_play_movies.png
+│   ├── hulu.png
+│   ├── max.png
+│   ├── stan.png
+│   ├── cannes.png
+│   ├── berlin.png
+│   └── venice.png
+├── .env
+├── README.md
+├── requirements.txt
+└── pages/
+    ├── 1_calc_page.py
+    ├── 2_mbti_page.py
+    └── 3_awards_page.py
+
 ```
 
+- **home.py**: 메인 페이지
+- **contents_search.py**: TMDB API 연동 및 데이터 조회 유틸 함수  
+- **country_filtering.py**: 국가 목록, 언어 코드 매핑
+- **recommend_engine.py**: RapidFuzz 기반 유사 영화 추천
+- **event_contents.py**: 날짜별 기념일 데이터(static_event_contents.json)를 불러오는 함수  
+- **ott_prices.db**: 국가별·플랫폼별 요금 정보 SQLite DB
+- **award_winners.db**: 칸, 베를린, 베니스 영화제 수상작 및 수상년도 매핑해놓은 SQLite DB
+- **images/**: OTT 및 영화제 로고들을 저장해놓은 이미지 폴더  
+- **.env**: TMDB API 키 환경변수 파일  
+- **requirements.txt**: 프로젝트 의존성 목록  
+- **pages/1_calc_page.py**: OTT 가성비 계산기 페이지  
+- **pages/2_mbti_page.py**: MBTI + 감정 기반 콘텐츠 추천 페이지  
+- **pages/3_mbti_page.py**: 세계 3대 영화제(칸, 베니스, 베를린) 수상작 리스트 페이지 
 ---
-
-## ✅ 향후 추가 가능 기능
-- 사용자 계정 시스템
-- 찜 목록 저장 및 공유
-- TMDB 평점 기반 필터링
