@@ -2,10 +2,8 @@ import sqlite3
 import re
 from googletrans import Translator
 
-# ✅ 전역 번역기 객체
-translator = Translator()
+translator = Translator()  # 전역에서 단 1회만 생성
 
-# ✅ OTT 가격 DB에서 사용 가능한 국가 목록 추출
 def get_available_countries():
     try:
         conn = sqlite3.connect("ott_prices.db")
@@ -18,30 +16,28 @@ def get_available_countries():
         print(f"[DB Error] {e}")
         return {}
 
-# ✅ 영어 비율이 높은지 판단 (TMDB 원제 필터링에 사용 가능)
 def is_english(text):
     if not text:
         return False
     letters = re.findall(r"[a-zA-Z]", text)
     return len(letters) / max(len(text), 1) > 0.6
 
-# ✅ TMDB / Google Translate용 언어코드 매핑
 def get_language_code(country_code):
     mapping = {
-        "KR": "ko", "US": "en", "GB": "en", "JP": "ja",
-        "FR": "fr", "DE": "de", "BR": "pt", "IN": "hi",
-        "AU": "en", "CA": "en", "IT": "it", "CN": "zh-CN",
-        "ES": "es", "RU": "ru", "MX": "es", "AR": "es"
+        "KR": "ko", "US": "en", "GB": "en", "JP": "ja", "FR": "fr",
+        "DE": "de", "BR": "pt", "IN": "hi", "AU": "en", "CA": "en"
     }
     return mapping.get(country_code.upper(), "en")
 
-# ✅ 영어 → 타겟 언어로 번역 (예: overview 설명 병기 시)
 def translate_text(text, target_lang):
     if not text:
         return ""
     try:
         result = translator.translate(text, src="en", dest=target_lang)
-        return result.text if hasattr(result, "text") else str(result)
+        if hasattr(result, 'text'):
+            return result.text
+        return str(result)
     except Exception as e:
         print(f"[Translation Error] {e}")
         return text
+
