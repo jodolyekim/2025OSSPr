@@ -52,7 +52,7 @@
 ├── country_filtering.py # Streamlit용 국가 선택 UI 함수
 ├── ott_ui_app.py        # 메인 Streamlit 앱
 ├── api_infos.txt        # (참고용) API 엔드포인트 및 정보 정리 텍스트
-├── logo_images/         # OTT 플랫폼 로고 아이콘 이미지 디렉터리
+├── images/         # OTT 플랫폼 로고 아이콘 이미지 디렉터리
 └──── netflix.png
    ├── watcha.png
    ├── wavve.png
