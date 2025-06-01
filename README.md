@@ -85,6 +85,7 @@
 ├── home.py
 ├── contents_search.py
 ├── country_filtering.py
+├── event_contents.py
 ├── ott_prices.db
 ├── images/
 │   ├── netflix.png
@@ -109,7 +110,8 @@
 
 - **home.py**: 메인 페이지
 - **contents_search.py**: TMDB API 연동 및 데이터 조회 유틸 함수  
-- **country_filtering.py**: 국가 목록, 언어 코드 매핑  
+- **country_filtering.py**: 국가 목록, 언어 코드 매핑
+- **event_contents.py**: 날짜별 기념일 데이터(static_event_contents.json)를 불러오는 함수    
 - **ott_prices.db**: 국가별·플랫폼별 요금 정보 SQLite DB
 - **images/**: OTT 및 영화제 로고들을 저장해놓은 이미지 폴더  
 - **.env**: TMDB API 키 환경변수 파일  
