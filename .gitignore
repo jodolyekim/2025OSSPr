@@ -22,3 +22,5 @@ venv/
 
 # 기타
 *.log
+.venv/
+.venv/
