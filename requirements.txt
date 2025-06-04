@@ -91,7 +91,6 @@ PySocks==1.7.1
 python-dateutil==2.9.0.post0
 python-dotenv==1.1.0
 pytz==2024.2
-pywin32==310
 PyYAML==6.0.2
 pyzmq==26.2.0
 referencing==0.36.2
@@ -131,3 +130,4 @@ wordcloud==1.9.4
 xyzservices==2024.9.0
 yt-dlp==2025.5.22
 zodiac-sign==0.2.5
+rapidfuzz==3.6.2

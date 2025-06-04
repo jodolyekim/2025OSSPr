@@ -195,7 +195,7 @@ if contents:
             st.markdown("---")
             st.subheader("🤖 이 콘텐츠와 비슷한 추천작")
 
-            similar = st.session_state["recommender"].get_similar(content["id"])
+            similar = st.session_state["recommender"].get_similar(content)
             if similar:
                 for i in range(0, len(similar), 5):
                     row = st.columns(5)
