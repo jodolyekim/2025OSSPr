@@ -203,3 +203,31 @@ def get_multilang_overview(content_id, media_type, lang_code="en"):
     except Exception as e:
         print(f"[Overview Multilang Error] {e}")
         return ""
+
+# contents_search.py
+# ✅ TMDB 인기 영화 목록을 불러오는 초기 콘텐츠 함수
+def get_initial_contents(count=50):
+    url = f"{BASE_URL}/movie/top_rated"
+    params = {"api_key": TMDB_API_KEY, "language": "ko-KR"}
+    response = requests.get(url, params=params)
+    results = response.json().get("results", [])[:count]
+
+    contents = []
+    for r in results:
+        if not r.get("overview"):  # overview 없는 경우는 제외
+            continue
+        contents.append({
+            "id": r["id"],
+            "media_type": "movie",
+            "title_ko": r.get("title"),
+            "title_en": r.get("original_title"),
+            "overview": r.get("overview"),
+            "poster_path": r.get("poster_path"),
+            "release_date": r.get("release_date", ""),
+            "vote_average": r.get("vote_average", 0.0)
+        })
+
+    return contents
+
+
+
